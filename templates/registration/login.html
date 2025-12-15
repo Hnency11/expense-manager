@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 4rem auto;">
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div style="color: var(--danger); font-size: 0.875rem; margin-top: 0.25rem;">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn" style="width: 100%;">Login</button>
+        </form>
+        <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+            Don't have an account? <a href="{% url 'register' %}" style="color: var(--primary-color);">Sign up</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    // Add form-control class to input fields rendered by Django
+    document.querySelectorAll('input').forEach(input => {
+        input.classList.add('form-control');
+    });
+</script>
+{% endblock %}

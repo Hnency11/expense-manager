@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header">
+    <h1>Dashboard</h1>
+    <div>
+        <a href="{% url 'add_transaction' %}" class="btn">Add Transaction</a>
+    </div>
+</div>
+
+<div class="summary-cards">
+    <div class="card summary-card">
+        <h3>Income</h3>
+        <div class="amount" style="color: var(--accent-color);">+₹{{ income|floatformat:2 }}</div>
+    </div>
+    <div class="card summary-card">
+        <h3>Expenses</h3>
+        <div class="amount" style="color: var(--danger);">-₹{{ expenses|floatformat:2 }}</div>
+    </div>
+    <div class="card summary-card">
+        <h3>Balance</h3>
+        <div class="amount">₹{{ balance|floatformat:2 }}</div>
+    </div>
+</div>
+
+<div class="charts-container">
+    <div class="card">
+        <h3>Expense Overview</h3>
+        <canvas id="expenseChart" height="200"></canvas>
+    </div>
+    <div class="card">
+        <h3>Recent Transactions</h3>
+        <table>
+            <tbody>
+                {% for transaction in recent_transactions %}
+                <tr>
+                    <td>{{ transaction.category.name }}</td>
+                    <td>{{ transaction.date }}</td>
+                    <td
+                        style="text-align: right; color: {% if transaction.type == 'INCOME' %}var(--accent-color){% else %}var(--danger){% endif %};">
+                        {% if transaction.type == 'INCOME' %}+{% else %}-{% endif %}₹{{ transaction.amount|floatformat:2
+                        }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No recent transactions</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="margin-top: 1rem; text-align: center;">
+            <a href="{% url 'transaction_list' %}" style="color: var(--primary-color); text-decoration: none;">View
+                All</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    const chartData = {
+        labels: {{ chart_labels| safe }},
+    datasets: [{
+        data: {{ chart_data| safe }},
+        backgroundColor: [
+        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+    ],
+        borderWidth: 0
+        }]
+    };
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: chartData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            },
+            cutout: '70%'
+        }
+    });
+</script>
+{% endblock %}
